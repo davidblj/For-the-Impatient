@@ -1,0 +1,96 @@
+
+    Chapter 1
+
+
+--- values and variables ---
+
+
+The Scala interpreter reads an expression, evaluates it, prints it,
+and reads the next expression. This is called the read-eval-print loop, or REPL.
+
+Is not an interpreter per se, becuase its output is bytecode that is inmediatly evaluated
+and printed into the console. 
+
+    Notes learned from this chapter
+
+-> Semicolons are only required if you have multiple statements on the same line
+    
+-> Scala has seven numeric types: Byte, Char, Short, Int, Long, Float, and Double, and a Boolean type. 
+There is no distinction between primitive types and class types in Scala. You can
+invoke methods on numbers
+
+    1.toString()
+    1.to(10)
+
+Those primitives may be augmented, and they are augmented by wrappers: 
+
+    "hello".intersect("world) // yields  "lo"
+
+"hello" is converted into an StringOps object, which provides an intersect method. Scala have
+additional wrappers for Ints, Doubles and Chars: RichInt, RichDouble, RichChar. You can also 
+operate with BigInt and BigDecimal
+
+-> In Scala you use methods, not casts  
+
+    99.toChar
+    44.toInt
+    "66".toString
+
+
+--- Operators ---
+
+
+     Bit operators & | ^ >> <<
+     And as usual, mat operators:  + - * / %
+    
+Operators are, surprisingly, methods. 
+
+You can write
+
+    a method b ~ a.method(b)
+
+
+--- Functions and methods ---
+
+
+-> Note that functions are easy to call than methods. You dont need instantation and you dont
+need to ever call an static property
+
+    import scala.math._ 
+    // import math._  <- this is an equivalent.
+
+    sqrt(2) // Yields 1.4142135623730951
+    pow(2, 4) // Yields 16.0
+    min(3, Pi) // Yields 3.0
+
+-> Scala methods without parameters often don’t use parentheses
+
+    "Hello".distinct 
+
+
+--- Apply method ---
+
+
+You can think of "()" as an overloaded operator. It is implemented
+as a method with the name apply
+
+    def apply(n: Int): Char   // RichString
+    "hello".apply(4)
+
+Using the apply method of a companion object is a common Scala idiom for constructing
+objects. For example, Array(1, 4, 9, 16) returns an array, thanks to the
+apply method of the Array companion object.
+
+
+Answers:
+
+    1. -
+    2. sqrt(sqrt(3)) 
+    3. -
+    4. crazycrazycrazy, found here: https://www.scala-lang.org/api/current/scala/collection/immutable/StringOps.html
+    5. x max y, returns x if x is greater than y, or y. found here: https://www.scala-lang.org/api/current/scala/runtime/RichInt.html
+    6. BigInt(2).pow(1024)
+    7. import scala.util.Random
+    8. probablePrime(32, Random).toString(36)
+    9. "crazy".head / "crazy".last
+    10. The difference is that in "substring", you have to define the starting index to trim the value.

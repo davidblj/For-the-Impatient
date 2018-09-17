@@ -1,0 +1,49 @@
+>- Current 22 <- 
+
+    Chapter 2
+
+
+--- Conditional Expressions ---
+
+
+if expressions have values
+
+    val s = if (x > 0) 1 else -1 
+
+S type is the common supertype of both branches.  if no "else" branch is specified, Unit is returned instead
+Unit is analogous to void in java, but Unit do represents a value: 'no value'
+
+
+--- Statement Termination ---
+
+
+lines can be split between your editor lines with an operator
+
+    s = s0 + (v - v0) * t + 
+        0.5 * (a - a0) * t * t 
+
+
+--- block expressions ----
+
+
+You use a block statement whenever you need to put multiple actions in the body of a branch or
+loop statement
+
+In Scala, a { } (block) contains a sequence of expressions, and the result is also an expression. 
+The value of the block is the value of the last expression:
+
+    val distance = { val dx = x - x0; val dy = y - y0; sqrt(dx * dx + dy * dy) }
+
+You cant chain assignments, since an assignment has a return value of 'Unit'
+
+    y = 1 // Unit
+    x = y = 1   // this line wont compile
+
+In the same spirit, the following is not valid:
+
+    x = { r = r * n; n -= 1 } // n -= 1 is an assignment. and hence, it wont compile
+
+
+--- Loops ---
+
+
