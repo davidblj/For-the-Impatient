@@ -1,4 +1,3 @@
->- Current 22 <- 
 
     Chapter 2
 
@@ -10,7 +9,7 @@ if expressions have values
 
     val s = if (x > 0) 1 else -1 
 
-S type is the common supertype of both branches.  if no "else" branch is specified, Unit is returned instead
+The type of "s" is the common supertype of both branches.  if no "else" branch is specified, Unit is returned instead
 Unit is analogous to void in java, but Unit do represents a value: 'no value'
 
 
@@ -37,9 +36,9 @@ The value of the block is the value of the last expression:
 -> You can't chain assignments, since an assignment has a return value of 'Unit'. Remember that 'Unit' is an empty value
 
     y = 1       // Unit
-    x = y = 1   // this line wont compile
+    x = y = 1   // X won't yield 1, but ()
 
-In the same spirit, the following is not valid:
+In the same spirit, the following isn't going to work as expected:
 
     x = { r = r * n; n -= 1 }   // n -= 1 is an assignment. and hence, it wont compile
 
@@ -85,3 +84,202 @@ is also feasible to define a for loop with line jumps
     for { i <- 1 to 3
         from = 4 - i
         j <- from to 3 }
+
+
+--- Functions ---
+
+
+-> you cant code functions in java, you have to define static methods on classes. 
+-> if the function is recursive, you have to specify the return type
+-> if the body of the function only requires one expression, dont use blocks. As usual, 
+   if you use blocks, the last statement yields the value of the function
+-> use returns to break out functionalities inside a function, but not as a return type (you can
+   do it though)
+
+
+--- Default and Named Arguments --- 
+
+
+default parameters are as follows (note: they must be the last parameters)
+
+    def decorate(str: String, left: String = "[", right: String = "]") =
+    left + str + right
+
+you can also specify the arguments you supply (note they are not ordered):
+
+    decorate(left = "<<<", str = "Hello", right = ">>>")
+
+and you can mix them both, but be aware: named arguments must be specified as the last arguments
+
+    decorate("Hello", right = "]<<<") // Calls decorate("Hello", "[", "]<<<")
+
+
+--- Default and Named Arguments --- 
+
+
+it  is  convenient  to  implement  a  function  that  can  take  a  variable
+number of arguments. The following example shows the syntax:
+
+    def sum(args: Int*) = {
+        var result = 0
+        for (arg <- args) result += arg
+        result
+    }
+
+    val s = sum(1, 4, 9, 16, 25)
+
+If you want to pass a sequence as a single argument, you must specify that in the
+compiler    
+
+    def sum(args: Int*) : Int = {
+        if (args.length == 0) 0 
+        else args.head + recursiveSum(args.tail : _*)   // args is as a seq with 
+                                                        // head and tail parameters
+    }
+
+    val s = sum(1 to 5: _*)
+
+
+--- Procedures --- 
+
+
+Procedures are functions that return no values. They do not specify an = sign and they
+are used because of its side effects
+
+    def box(s : String) { 
+        val border = "-" * s.length + "--\n"
+        println(border + "|" + s + "|\n" + border)
+    } 
+
+But you can use an explicit syntax for units (author's preference). 
+
+    def box(s : String) : Unit = {  
+        ...
+    }     
+
+
+--- Lazy values --- 
+
+
+When a val is declared as lazy , its initialization is deferred until it is accessed for the first time
+
+    lazy val words = scala.io.Source.fromFile("/usr/share/dict/words").mkString
+
+the previous line wont try to open a file when declared. If the filename is wrong, an error wont be thrown
+until you explicitly call "words"
+
+Lazy values are useful to delay costly initialization statements. useful for circular dependencies and lazy
+data structures (streams)
+
+
+--- Exceptions ---
+
+
+Like in java, unhandled exceptions terimante forcefully the program. Unlike Java, Scala has no “checked” 
+exceptions (exceptions that inherit from throwbable) you never have to declare that a function or method
+ might throw an exception. This makes the code less readable:  
+ 
+    doSomething() throws IOException, InterruptedException, ClassNotFoundException
+
+Java programmers detest this feature and they eiter catch a general execption, or they catch them to quickly (how?)
+
+The syntax for a try and catch is used with a pattern matching syntax
+
+    try { 
+        process(new URL("http://horstmann.com/fred-tiny.gif"))
+    } catch {
+        case _: MalformedURLException => println("Bad URL: " + url)  // no need to specify the exception
+        case ex: IOException => ex.printStackTrace()
+    }
+
+The try/finally statement lets you dispose of a resource whether or not an exception has occurred
+
+    var in = new URL("http://horstmann.com/fred.gif").openStream()
+    try {
+        process(in) // the try and finally blocks wont execute if "openStream" throws        
+    } finally {     // this is always executed regardless of exceptions thrown in "process(in)"
+        in.close()  
+    }
+
+try/catch is used to handle exceptions, and try/finally is used for clean up operations. You can
+match them of course 
+
+
+Answers:
+
+    1. 
+
+def signumOf(number: Int) = if (number < 0) -1 else 1
+
+    2. its return is "()" and its type is Unit
+    3. ?
+    4. 
+
+for(x <- (0 to 10).reverse) {
+  println(x)
+}
+
+    5. 
+
+def countdownProcedure(top: Int): Unit = {
+  for(x <- (0 to top).reverse) {
+    println(x)
+  }
+}
+
+    6. 
+
+def stringToUnitCodeProductV2(sequence: String): Int = {
+  var product = 1
+  for (char <- sequence) {
+    product *= char.toChar.toInt
+  }
+  product
+}
+
+    7. 
+
+"Hello".map(_.toInt).product
+
+    8. 
+
+def product(s: String) = {
+    s.map(_.toInt).product
+}
+
+    9. 
+
+def stringToUnitCodeProduct(sequence: String) = {
+
+  def getIntValueFrom(stringCharacter: Char): Int = stringCharacter.toInt
+
+  def getProduct(stringValue: String): Int = {
+    val isEmpty = stringValue.length == 0
+    if(isEmpty) 1 else getIntValueFrom(stringValue.head) * getProduct(stringValue.tail)
+  }
+
+  getProduct(sequence)
+}
+
+    10. 
+
+def customPow(base: Int, power: Int): Int = {
+
+  def isEven = power % 2 == 0
+  def isPositive = base > 0
+  
+  def raiseCustomBaseByTwo(baseEquivalence: Double) = pow(baseEquivalence, 2)
+  def multiplyBase() = base * pow(base, power - 1)  
+
+  def operateCustomPow() = {
+    if (power == 0) {
+      1
+    } else if (isPositive) {
+      if (isEven) raiseCustomBaseByTwo(pow(base, power/2)) else multiplyBase()
+    } else {
+      1 / pow(base, -power)
+    }
+  }
+
+  operateCustomPow().toInt
+}
