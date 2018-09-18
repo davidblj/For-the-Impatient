@@ -34,16 +34,48 @@ The value of the block is the value of the last expression:
 
     val distance = { val dx = x - x0; val dy = y - y0; sqrt(dx * dx + dy * dy) }
 
-You cant chain assignments, since an assignment has a return value of 'Unit'
+-> You can't chain assignments, since an assignment has a return value of 'Unit'. Remember that 'Unit' is an empty value
 
-    y = 1 // Unit
+    y = 1       // Unit
     x = y = 1   // this line wont compile
 
 In the same spirit, the following is not valid:
 
-    x = { r = r * n; n -= 1 } // n -= 1 is an assignment. and hence, it wont compile
+    x = { r = r * n; n -= 1 }   // n -= 1 is an assignment. and hence, it wont compile
 
 
 --- Loops ---
 
 
+loops are different in Scala, the closest to a java loop in Scala, is:
+
+    for (i <- 1 to n) r = r * i  // i <- expression
+
+where the type of i, is the type of the expression elements. Here, an Expression, can be a Range (x to y), Strings.
+do keep in mind that loops are not common in a language with fp.
+
+
+--- Advanced for Loops ---
+
+
+Scala loops are powerfull
+
+    for (i <- 1 to 3; j <- 1 to 3) print(f"${10 * i + j}%3d")
+    // Prints 11 12 13 21 22 23 31 32 33
+
+you can define guards inside of them
+
+    for (i <- 1 to 3; j <- 1 to 3 if i != j) print(f"${10 * i + j}%3d")
+    // Prints 12 13 21 23 31 32
+
+you can define variables
+
+    for (i <- 1 to 3; from = 4 - i; j <- from to 3) print(f"${10 * i + j}%3d")
+    // Prints 13 22 23 31 32 33
+    // this is the result of: 3 to 3, 2 to 3, 1 to 3
+
+When the body of the for loop starts with yield , the loop constructs a collection
+of values, one for each iteration:
+
+    for (i <- 1 to 10) yield i % 3
+    // Yields Vector(1, 2, 0, 1, 2, 0, 1, 2, 0, 1)
