@@ -2,23 +2,256 @@
     Chapter 3
 
 use an Array if the length is fixed, and an ArrayBuffer if the length can vary.
-dont use new when suppluying initial values
+dont use "new" when suppluying initial values
 use (elem <- arr) to traverse the elements
-use for (elem <- arr if ...) ... yield ...
+use "for (elem <- arr if ...) ... yield ..." to filter elements out of the array
 
 
 --- Fixed-Length Arrays ---
 
+take a closer look at the following array operations
 
 val nums = new Array[Int](10)   // An array of ten integers, all initialized with zero
 val a = new Array[String](10)   // A string array with ten elements, all initialized with null
 val s = Array("Hello", "World") // An Array[String] of length 2—the type is inferred
                                 // Note: No "new" when you supply initial values
-s(0) = "Goodbye" // Array("Goodbye", "World")
+
+s(0) = "Goodbye"                // Array("Goodbye", "World")
 
 val b = ArrayBuffer[Int]() // use array buffers to have arrays that grow and shrink
 b += 1
 b += (1, 2, 3, 5)
 b ++= Array(8, 13, 21)
 
-<<<current: traversing arrays and buffers>>>
+
+--- traversing arrays and buffers ---
+
+
+you can traverse arrays with for comprehension
+
+    for (i <- array.lenght - 1) {
+        myArray(i)
+    }
+
+you can traverse elements with jumps
+
+    for (0 until a.length by 2) {...}
+
+or backwards
+
+    for (elem <- array.indices.reverse) {...}
+
+do also keep in mind that if you dont need the index, just obtain the element directly
+
+    for( x <- array) {
+        x
+    }
+
+The for / yield loop creates a new collection of the same type as the original collec-
+tion. If you started with an array, you get another array. If you started with an
+array buffer, that’s what you get from for / yield. Here is an example with a guard
+included:
+
+    for (elem <- a if elem % 2 == 0) yield 2 * elem
+
+With fp, you can do it with a filter and a map function. This is prefered by some people
+
+    a filter { _ % 2 == 0 } map { 2 * _ }
+
+
+--- Common Algorithms ---
+
+
+Here are some common operations: 
+
+    Array(1, 7, 2, 9).sum
+    ArrayBuffer("Mary", "had", "a", "little", "lamb").max   // prints "little". A min operation is also availabe
+    array.search("element")   // binary search
+
+You can sort them, but sorts are different on arrays:
+
+    val a = Array(1, 7, 2, 9)
+    scala.util.Sorting.quickSort(a)
+
+and array buffers:
+
+    b.sortWith(_ > _)
+
+
+--- Deciphering Scaladoc ---
+
+
+Just a quick note: all iterables and collections extends the following traits: TraversableOnce, Traversable, iterables. The Array
+library have some methods with those parameters.
+
+
+--- Multidimensional Arrays ---
+
+Multidimensional arrays are of type: Array[Array[Double]]. this array (with rows and columns) can be specified as follows
+
+    val matrix = Array.ofDim[Double](3, 4) // Three rows, four columns
+
+you access them by:
+
+    matrix(row)(column) = 42
+
+colums can be initialize with different lengths
+
+    val triangle = new Array[Array[Int]](10)
+    for (i <- triangle.indices) 
+        triangle(i) = new Array[Int](i + 1)  // for each row, make a new array (a column of size n + 1)
+
+
+--- Interoperating with java ---
+
+
+In Java, an array of a given type is automatically converted to an array of
+a supertype. For example, a Java String[] array can be passed to a method that
+expects a Java Object[] array. 
+
+Say that you want to use a binary search with java:
+
+    val a = Array("Mary", "a", "had", "lamb", "little")
+    java.util.Arrays.binarySearch(a, "beef") // Does not work because "a" needs to be an object
+
+use this instead (with an explicit convertion per the java documentation):
+
+    java.util.Arrays.binarySearch(a.asInstanceOf[Array[Object]], "beef")
+
+
+--- Automatic convertions ---
+
+
+The latter is also the case while working with lists. We are going to use an implicit conversion
+to pass the array buffer which will be wrapped into a java list automatically
+
+
+    import scala.collection.JavaConversions.bufferAsJavaList
+    import scala.collection.mutable.ArrayBuffer
+
+    val command = ArrayBuffer("ls", "-al", "/home/cay")
+    val pb = new ProcessBuilder(command) // Scala to Java
+
+
+Conversely, when a Java method returns a java.util.List , you can have it
+automatically converted into a Buffer:    
+
+
+    import scala.collection.JavaConversions.asScalaBuffer
+    import scala.collection.mutable.Buffer
+    
+    val cmd : Buffer[String] = pb.command() // Java to Scala
+    // You can’t use ArrayBuffer—the wrapped object is only guaranteed to be a Buffer
+
+
+Answers:
+
+    1.
+
+def getRandomBetweenOneHundred = new Random().nextInt(100)
+
+val max = getRandomBetweenOneHundred
+val randomNumbers = new Array[Int](max)
+
+for (i <- 0 until max) {
+  randomNumbers(i) = getRandomBetweenOneHundred
+}
+
+randomNumbers
+
+    2.
+
+val array = Array(1,2,3,4,5,6)
+
+for (i <- array.indices by 2) {
+  
+  val itReachedTop = (array.length - 1) == i
+  if (!itReachedTop) {
+
+    val current = i
+    val next = current + 1
+
+    val currentValue = array(current)
+    array(current) = array(next)
+    array(next) = currentValue
+  }
+}
+
+array
+
+    3.
+
+var array = Array(1,2,3,4,5,6)
+def isEven(index: Int) = index % 2 == 0
+
+val newArray = for (i <- array.indices) yield {
+
+  if (isEven(i)) {
+    val itReachedTop = (array.length - 1) == i
+    if (!itReachedTop) array(i + 1) else array(i)
+  } else {
+    array(i - 1)
+  }
+}
+
+newArray
+
+    4.
+
+var array = ArrayBuffer(1,2,-2,3,-3,4,0,5,6)
+val arrayOfPositives = for (element <- array if element > 0) yield element
+val arrayOfNegatives = for (element <- array if element <= 0) yield element
+val newArray = arrayOfPositives ++= arrayOfNegatives
+
+    5.
+
+var array = ArrayBuffer[Double](1,2,3)
+val average = array.sum/array.length
+
+    6. with the reverse function
+    7. with the distinct function
+
+    8.
+
+var array = ArrayBuffer(1,2,-2,2,-4,-5,2,-6)
+
+val indeces: Seq[Int] = for (i <- array.indices if array(i) < 0) yield i
+val reverse = indeces.drop(1).reverse
+for (element <- reverse) array.remove(element)
+
+array
+
+    9.  what is meant by this question, is to shift to the left the elements that must be moved
+        and not the elements that must be removed
+
+var array = ArrayBuffer(1,2,-2,2,-4,-5,2,-6)
+
+var indexToReplace = array.indexWhere(element => element < 0) + 1
+val indicesToShift = for (i <- indexToReplace until array.length if array(i) >= 0) yield i
+
+indicesToShift
+
+if (indexToReplace != 0) {
+  for (i <- indicesToShift.indices) {
+    val indexToShift = indicesToShift(i)
+    array(indexToReplace) = array(indexToShift)
+    indexToReplace += 1
+  }
+}
+
+array.slice(0, indexToReplace)
+
+    10. On this excercise, timezones are sorted by default. If it wasn't, we would've use "sorted"
+
+val timezones: Array[String] = TimeZone.getAvailableIDs()
+  .filter(timezones => timezones.startsWith("America"))
+
+timezones.map(timezone => timezone.stripPrefix("America/"))
+
+    11.
+
+import scala.collection.JavaConverters._
+import scala.collection.mutable
+
+val flavors = SystemFlavorMap.getDefaultFlavorMap().asInstanceOf[SystemFlavorMap]
+val array: mutable.Seq[String] = flavors.getNativesForFlavor(DataFlavor.imageFlavor).asScala

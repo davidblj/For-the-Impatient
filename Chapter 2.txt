@@ -202,7 +202,7 @@ The try/finally statement lets you dispose of a resource whether or not an excep
     }
 
 try/catch is used to handle exceptions, and try/finally is used for clean up operations. You can
-match them of course 
+mix them of course 
 
 
 Answers:
