@@ -116,6 +116,7 @@ and you can mix them both, but be aware: named arguments must be specified as th
 
 --- Default and Named Arguments --- 
 
+A lot of topics on this section have been skipped
 
 it  is  convenient  to  implement  a  function  that  can  take  a  variable
 number of arguments. The following example shows the syntax:
