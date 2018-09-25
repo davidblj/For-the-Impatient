@@ -22,7 +22,7 @@ But your implementation can be more elegant
 -> You can return option values with "get()", and assign default values for non existing keys
 
     score.get("bob")    
-    scores.withDefaultValue(0)
+    scores.withDefaultValue(0) // this function only applies to "get" operations
 
 -> inmutable maps can't be updated, but you can do something that’s just as
 useful— obtain a new map that has the desired update
@@ -34,11 +34,11 @@ useful— obtain a new map that has the desired update
 ---  Iterating over Maps ---
 
 
-You can mix some pattern matching in a regular for loop. This prevents tedious calls on your map
+-> You can mix some pattern matching in a regular for loop. This prevents tedious calls on your map
 
     for ((k, v) <- map) // ... process k, and v
 
-You can iterate over every key, or every value:
+-> You can iterate over every key, or every value:
 
     for (values <- map.values)
     for (keys <- map.keySet)
@@ -50,4 +50,194 @@ Reversing maps is just as simple as this
 
 --- Sorted Maps --- 
 
+
+Maps are based on hash tables, and hence, you can't access them in order, use this instead:
+
+    SortedMap("Alice" -> 10, "Bob" -> 3, "Cindy" -> 8)
+
+
+--- Interoperating with Java ---
+
+
+Just as we did in the last chapter, we can convert from java maps to scala maps, and vice versa.
+
+Java to Scala example
+
+    import scala.collection.JavaConverters._
+    val scores: scala.collection.mutable.Map[String, Int] =  
+        new java.util.TreeMap[String, Int].asScala
+
+Scala to Java example
+
+    import scala.collection.JavaConverters._
+    import java.awt.font.TextAttribute._ // Import keys for map below 
+    val attrs = Map(FAMILY -> "Serif", SIZE -> 12).asJava // A Scala map 
+    val font = new java.awt.Font(attrs) // Expects a Java ma 
+
+
+--- Tuples ----
+
+
+-> Tuples are useful when you need to return more than one value
+
+-> Each time you spawn a tuple, say: (1,2,3) you are creating
+an object of type Tuple3(....).  
+
+-> You access a tuple value with the "._n" operator. for example
+
+    val simpleTuple = ("a", "b", "c")
+    simpleTuple._1 // yields "a"
+
+Note that, unlike arrays, tuples start from 1 and not 0. But you should
+use pattern matching instead:
+
+    val (first, second, third) = simpleTuple
+    val (first, second, _) = simpleTuple
+
+
+--- Zipping ---
+
+
+Zipping is used to mix in tuples, so each new pair of elements can be processed together:
+
+    val symbols = Array("<", "-", ">")
+    val counts = Array(2,10,2)
+    val pairs = symbols.zip(counts)  // Array(("<", 2), ("-", 10), (">", 2))  
+    
+    for ((s, n) <- pairs) print(s * n) 
+
+
+Answers:
+
+
+    1. 
+
+val gizmos = Map("Razer Hunstam" -> 150, "Razer Basilisk" -> 60)
+val discountGizmos = gizmos.mapValues(price => price * (0.9))
+
+    2. 
+
+val in = new java.util.Scanner(new java.io.File("C:\\Users\\david.jaramillo\\Desktop\\repos\\Idea workspace\\Starter\\file.txt"))
+var wordCount = scala.collection.mutable.Map[String, Int]()
+
+while (in.hasNext()) {
+  val currentWord = in.next()
+  val count = wordCount.getOrElse(currentWord, 0)
+  wordCount += (currentWord -> (count + 1)) // this line updates or adds a new value
+}
+
+wordCount
+
+    3.  repeat the previous one with an inmutable map
+
+val in = new java.util.Scanner(new java.io.File("C:\\Users\\david.jaramillo\\Desktop\\repos\\Idea workspace\\Starter\\file.txt"))
+
+def getWordCount(words: Scanner) = {
+
+  def loop(currentWord: String, wordCount: Map[String, Int]): Map[String, Int] = {
+
+    val count = wordCount.getOrElse(currentWord, 0)
+    val newMap = wordCount + (currentWord -> (count + 1))
+    
+    if (!words.hasNext()) newMap
+    else loop(words.next(), newMap)
+  }
+
+  loop(words.next(), Map[String, Int]())
+}
+
+getWordCount(in)
+
+    4. do it now with a sorted map
+
+def getWordCount(words: Scanner) = {
+
+  def loop(currentWord: String, wordCount: SortedMap[String, Int]): SortedMap[String, Int] = {
+
+    val count = wordCount.getOrElse(currentWord, 0)
+    val newMap = wordCount + (currentWord -> (count + 1))
+
+    if (!words.hasNext()) newMap
+    else loop(words.next(), newMap)
+  }
+
+  loop(words.next(), SortedMap[String, Int]())
+}
+
+getWordCount(in)
+
+    5. 
+
+def getWordCount(words: Scanner) = {
+
+  def loop(currentWord: String, wordCount: util.TreeMap[String, Int]): util.TreeMap[String, Int] = {
+
+    val count = Option(wordCount.get(currentWord))
+    wordCount.put(currentWord, (count.getOrElse(0) + 1))
+
+    if (!words.hasNext()) wordCount
+    else loop(words.next(), wordCount)
+  }
+
+  loop(words.next(), new util.TreeMap[String, Int]())
+}
+
+getWordCount(in)
+
+    6. Note: a linked hash table is a mutable map that uses a hash table (like a regular map does), but
+    we can traverse its elements in a sorted manner
+
+val days = LinkedHashMap(
+  "MONDAY" -> java.util.Calendar.MONDAY,
+  "TUESTDAY" -> java.util.Calendar.TUESDAY,
+  "WEDNESDAY" -> java.util.Calendar.WEDNESDAY,
+  "THURSDAY" -> java.util.Calendar.THURSDAY,
+  "FRIDAY" -> java.util.Calendar.FRIDAY,
+)
+
+for ((day, javaDay) <- days) {
+  println(s"$day ~ in java is: $javaDay")   // lines are printed in the same order of insertion
+}
+
+    7. 
+
+import java.util.Properties
+import scala.collection.JavaConverters._
+import scala.collection.mutable
+
+val properties: Properties = System.getProperties
+val mapProperties: mutable.Map[String, String] = properties.asScala
+
+def printProperties() = {
+
+  val longestProperty = {
+
+    var longestPropertyValue = 0
+
+    for ((property, _) <- mapProperties) {
+      val propertyLength = property.length
+      if (propertyLength > longestPropertyValue)  longestPropertyValue = propertyLength
+    }
+
+    longestPropertyValue
+  }
+
+  def printEmptySpaces(property: String) = {
+    
+    val emptySpaces = longestProperty - property.length
+    for (i <- 0 to emptySpaces) {
+      print(" ")
+    }
+  }
+
+  for ((property, value) <- mapProperties) {
+    print(s"$property")
+    printEmptySpaces(property)
+    println(s" |$value")
+  }
+}
+
+printProperties()
+
+    8.
 
