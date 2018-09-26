@@ -241,3 +241,44 @@ printProperties()
 
     8.
 
+def minmax(values: Array[Int]): (Int, Int) = {
+
+  def loop(min_max: (Int, Int), iterator: Int): (Int, Int) = {
+
+    if (iterator < values.length) {
+
+      val currentValue = values(iterator)
+      if (min_max._1 > currentValue) loop((currentValue, min_max._2), iterator + 1)
+      else if (min_max._2 < currentValue) loop((min_max._1, currentValue), iterator + 1)
+      else loop(min_max, iterator + 1)
+
+    } else {
+      min_max
+    }
+  }
+
+  val initialValue = values(0)
+  loop((initialValue,initialValue), 0)
+}
+
+minmax(Array(1,2,3,5,6))
+
+    9.
+
+def lteqgt(values: Array[Int], v: Int): (Int, Int, Int) = {
+
+  def getLowerThanOccurrences = values.count(value => value < v)
+  def getEqualToOccurrences = values.count(value => value == v)
+  def getHigherThanOccurrences = values.count(value => value > v)
+
+  (getLowerThanOccurrences, getEqualToOccurrences, getHigherThanOccurrences)
+}
+
+lteqgt(Array(1,1,2,3,4,5), 2)
+
+    10. 
+
+Vector((H,W), (e,o), (l,r), (l,l), (o,d))
+
+i can't think of anything D:
+

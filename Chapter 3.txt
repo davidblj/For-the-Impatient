@@ -87,6 +87,7 @@ library have some methods with those parameters.
 
 --- Multidimensional Arrays ---
 
+
 Multidimensional arrays are of type: Array[Array[Double]]. this array (with rows and columns) can be specified as follows
 
     val matrix = Array.ofDim[Double](3, 4) // Three rows, four columns
