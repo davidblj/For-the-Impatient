@@ -1,9 +1,189 @@
 
     Chapter 5
 
+
+--- Classes ---
+
+
 -> Class methods are public by default
 
 -> A Scala source file can contain multiple classes, and all of them have public visibility. There is no
-    keyword 'public'
+   keyword 'public' in Scala
 
 -> methods can be invoked with the parantesis, or without it
+
+    Which form should you use? It is considered good style to use () for a
+    mutator method (a method that changes the object state), and to drop the () 
+    for an accessor method (a method that does not change the object state
+
+    you can enforce this style by specifying the method itself without the parantesis
+
+    class Counter {
+          private var value = 0             // properties must be initialize
+          def increment() { value += 1 }    // mutator
+          def current = value               // non mutator
+    }
+
+-> Scala generates getter and setter methods automatically. They are either public or private, depending on your
+   property definition
+
+    class Person {  
+        var age = 0     // NOTE the keyword var. If this variable would have been private,
+                        // getters and setters would also be private
+    } 
+
+    // translates to
+
+    class Person {
+        private var age = 0             // private field
+        def age() = age                 // public getter
+        def age_=(newAge: Int) = {      // public setter 
+            age = newAge
+        }
+    }
+
+    // and they are invoked like this
+
+    fred.age            // invokes getter
+    fred.age = 21       // invokes setter
+
+You can re-define them manually, and even add some guards.
+
+If the property is a "val", only a getter is generated. This is usefull for read only
+properties (as that field is of type 'private final ...')
+
+You may want to define a "var", a private variable, but that variable can be mutated
+in some way at will by the client. You can achieve that, like this:
+
+    class Counter { 
+        private var value = 0  
+        def increment() { value += 1 }  // custom setter
+        def current = value             // custom getter
+    } 
+
+
+--- Object private fields ---
+
+
+A class method can ACCESS the private fields of every concrete implementation of its class
+
+    class Counter {  
+        private var value = 0  
+        def increment() { value += 1 }
+        def isLess(other : Counter) = {            
+            value < other.value     // other.value is PRIVATE, but accessible nontheless
+        }
+    }    
+
+That is not an object private field, an object private field is a property that can only be accessed
+by the current object
+
+    class Counter {
+        private[this] var value = 0     // setters and getters are not generated
+        ...
+        value < other.value             // this operation is not valid
+    }
+
+"private["classname"]"  allows you to grant access rights to specific classes. In the previous example
+we gave access only to its own class
+
+The last 2 features are not commonly used.
+
+
+--- Bean Properties ---
+
+
+The java beans specification says that setters and getters must be named as a pair of getFoo / setFoo.
+
+When you annotate a Scala ﬁeld with @BeanProperty, then such methods are automatically generated. 
+For example, 
+
+    import scala.beans.BeanProperty
+
+    class Person {  
+        @BeanProperty var name: String = _ 
+    }
+
+generates four methods: 
+    1. name: String 
+    2. name_=(newValue: String): Unit 
+    3. getName(): String 
+    4. setName(newValue: String): Unit
+
+
+--- Auxiliary constructors ---
+
+
+A class may have primary or auxiliary constructors, auxiliary constructors are defined with the keyword 'this'. Every auxiliar
+constructor, must start by calling the primary constructor, or a previous  auxiliary constructor, e.g:
+
+    class Person {  
+        
+        private var name = ""  
+        private var age = 0
+
+        def this(name: String) { // An auxiliary constructor    
+            this() // Calls primary constructor    
+            this.name = name   
+        }
+
+        def this(name: String, age: Int) { // Another auxiliary constructor   
+            this(name) // Calls previous auxiliary constructor    
+            this.age = age   
+        } 
+    }
+
+And the, you have 3 ways to instantiate a class:
+
+    val p1 = new Person         // Primary constructor, since there are no parameters defined after the classname.
+                                // Take a look at the next section for more info
+    val p2 = new Person("Fred") // First auxiliary constructor 
+    val p3 = new Person("Fred", 42) // Second auxiliary constructor
+
+Auxiliary constructors can be eliminated using default values in the primary constructor (as explained in the next section)    
+
+
+--- Primary Constructor ---
+
+
+-> In Scala, every class has a primary constructor. The primary constructor is not deﬁned with a "this" method. 
+Instead, it is interwoven with the class deﬁnition
+
+    class Person(val name: String, val age: Int)    // you can provide them with default values
+    new Person("Fred", 42)
+
+-> The primary constructor executes all statements in the class deﬁnition. For example, in the following class:
+
+    class Person(val name: String, val age: Int) { 
+        println("Just constructed another person")  
+        def description = s"$name is $age years old" 
+    } 
+
+the println statement is a PART of the primary constructor. It is executed whenever an object is constructed. This is used
+when you need to conﬁgure a ﬁeld during construction.
+
+-> you can provide the primary constructor with:
+
+    [private] [val/var] propertyName
+
+Those would have the same effects as if they were defines as properties in the body of the class (as stated in the previous sections)
+
+But there is still one case that we have not yet covered, what happen when you dont specify a "val", or "var" parameter ? 
+there are two possible cases
+
+    If those parameters are used inside at least one method, they become fields. But those fields are object-private (meaning
+    that they do not have getters or setters), and they are inmutable
+
+        class Person(name: String, age: Int) {  def description = s"$name is $age years old" } 
+
+    If they are not, they are only executable by the primary constructor statements
+
+-> you can make all the variables of a primary constructor, private
+
+    class Person private(val id: Int) { ... }
+
+
+--- Nested Classes ---
+
+
+    You can deﬁne functions inside other functions, and classes inside other classes
