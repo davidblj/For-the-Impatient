@@ -1,0 +1,9 @@
+
+    Chapter 5
+
+-> Class methods are public by default
+
+-> A Scala source file can contain multiple classes, and all of them have public visibility. There is no
+    keyword 'public'
+
+-> methods can be invoked with the parantesis, or without it
