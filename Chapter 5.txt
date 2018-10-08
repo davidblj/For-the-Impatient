@@ -1,7 +1,6 @@
 
     Chapter 5
 
-
 --- Classes ---
 
 
@@ -186,4 +185,80 @@ there are two possible cases
 --- Nested Classes ---
 
 
-    You can deﬁne functions inside other functions, and classes inside other classes
+You can deﬁne functions inside other functions, and classes inside other classes.
+
+Look at this specific use case, we abstract away a chat list. A chat room have
+members, and each member has contacts. 
+
+    import scala.collection.mutable.ArrayBuffer
+    
+    class Network {
+    
+    class Member(val name: String) {
+        val contacts = new ArrayBuffer[Member]
+    }
+
+    private val members = new ArrayBuffer[Member]
+    
+    def join(name: String) = {
+            val m = new Member(name)
+            members += m
+            m
+        }
+    }
+
+The gaol behind the previous class is to create an arrayBuffer of members. Each time we add
+an item, a new "member" is created and appended to it. This is a "Network" of members, each member
+with a list of contacts, which are also members. 
+
+In Scala, each instance has its own class Member, just like each instance has its own
+field members. That is, chatter.Member and myFace.Member are different classes.
+
+    val slack = new Network
+    val discord = new Network
+
+    val fred = slack.join("Fred")
+    val wilma = slack.join("Wilma")
+    
+    fred.contacts += wilma                  // OK
+    
+    val barney = discord.join("Barney")     // Has type myFace.Member
+    
+    fred.contacts += barney                 // No—can’t add a slack.Member to a buffer of discord.Member elements
+
+
+To access the scope of the outer class, you need to follow this syntax
+
+    class Network(val name: String) { outer =>
+        
+        class Member(val name: String) {
+        ...
+        def description = s"$name inside ${outer.name}"
+
+        }
+    }
+
+Class OuterClass(variables) { outer => 
+    Class InnerClass(variables) {
+        // definitions
+    }
+}
+
+
+Answers:
+
+
+1. improve the counter class on page 55 so that it doesn’t turn negative at Int.MaxValue:
+
+    // initial implementation
+    
+    class Counter {
+        private var value = 0 
+        def increment() { value += 1 } 
+        def current() = value
+    }
+
+    myCounter.increment()
+    println(myCounter.current)
+
+    
