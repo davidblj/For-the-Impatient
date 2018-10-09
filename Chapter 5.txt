@@ -51,7 +51,7 @@ You can re-define them manually, and even add some guards.
 If the property is a "val", only a getter is generated. This is usefull for read only
 properties (as that field is of type 'private final ...')
 
-You may want to define a "var", a private variable, but that variable can be mutated
+You may want to define a private variable of type "var", and mutable
 in some way at will by the client. You can achieve that, like this:
 
     class Counter { 
@@ -74,7 +74,7 @@ A class method can ACCESS the private fields of every concrete implementation of
         }
     }    
 
-That is not an object private field, an object private field is a property that can only be accessed
+"value" is not an 'object private field', an object private field is a property that can only be accessed
 by the current object
 
     class Counter {
@@ -132,7 +132,7 @@ constructor, must start by calling the primary constructor, or a previous  auxil
         } 
     }
 
-And the, you have 3 ways to instantiate a class:
+And then, you have 3 ways to instantiate a class:
 
     val p1 = new Person         // Primary constructor, since there are no parameters defined after the classname.
                                 // Take a look at the next section for more info
@@ -248,17 +248,75 @@ Class OuterClass(variables) { outer =>
 Answers:
 
 
-1. improve the counter class on page 55 so that it doesn’t turn negative at Int.MaxValue:
+    1.
 
-    // initial implementation
-    
-    class Counter {
-        private var value = 0 
-        def increment() { value += 1 } 
-        def current() = value
+// initial implementation
+
+class Counter {
+    private var value = 0 
+    def increment() { value += 1 } 
+    def current() = value
+}
+
+myCounter.increment()
+println(myCounter.current)
+
+// new implementation
+
+val sum: Long = Int.MaxValue + 6                                // overflow
+val sumOfLongs: Long = (Int.MaxValue).asInstanceOf[Long] + 6    // sum handled successfully    
+
+class Counter {
+
+    private var value: Long = Int.MaxValue 
+
+    def increment() {
+        value += 1
     }
+    def current = value
+}
 
-    myCounter.increment()
-    println(myCounter.current)
+val counter = new Counter;
+counter.increment()
+counter.current
 
-    
+
+    2. 
+
+// functional approach
+
+class BankAccount(val balance: Long = 0) {
+
+  def deposit(amount: Int) = {
+    new BankAccount(balance + amount)
+  }
+
+  def withdraw(amount: Int) = {
+    new BankAccount(balance - amount)
+  }
+}
+
+val myAccount = new BankAccount
+myAccount.deposit(3).balance
+
+
+// non functional approach 
+
+class BankAccount(private var balance: Long = 0) {
+
+  def deposit(amount: Int) = {
+    balance += amount
+  }
+
+  def withdraw(amount: Int) = {
+    balance -= amount
+  }
+  
+  def current = balance
+}
+
+val myAccount = new BankAccount
+myAccount.deposit(3)
+myAccount.current
+
+
