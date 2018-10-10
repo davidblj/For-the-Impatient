@@ -320,3 +320,64 @@ myAccount.deposit(3)
 myAccount.current
 
 
+    3. 
+
+class Time(private val hours: Int, private val minutes: Int) {
+
+  def before(other: Time): Boolean = {
+
+    val hourIsLesser = hours < other.hours
+    val minuteIsLesser = hours == other.hours & minutes < other.minutes
+
+    if (hourIsLesser | minuteIsLesser) true else false
+  }
+}
+
+val time1 = new Time(2,4)
+val time2 = new Time(2,5)
+time1.before(time2)
+
+
+    4.
+
+class Time(private val hours: Int,private val minutes: Int) {
+
+  def getTimeInMinutes() = {
+    (hours * (60 - 1)) + minutes
+  }
+
+  def before(other: Time): Boolean = {
+    val timeIsLesser = getTimeInMinutes() < other.getTimeInMinutes()
+    if (timeIsLesser) true else false
+  }
+}
+
+val time1 = new Time(5,4)
+val time2 = new Time(3,5)
+time1.before(time2)
+
+
+    5. UNRESOLVED. Follow the steps on page 74
+
+class Student {
+  @BeanProperty var name: String = _
+  @BeanProperty var id: Long = _
+}
+
+    6. 
+
+// Original class
+
+class Person() {   
+   age = 0
+}
+
+//  Modified class. 
+
+class Person(var age: Int) { 
+  if (age < 0) age = 0
+}
+
+val person = new Person(-30)
+person.age
+
