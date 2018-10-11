@@ -357,7 +357,7 @@ val time2 = new Time(3,5)
 time1.before(time2)
 
 
-    5. UNRESOLVED. Follow the steps on page 74
+    5. UNRESOLVED. Follow the steps on page 74.
 
 class Student {
   @BeanProperty var name: String = _
