@@ -114,7 +114,7 @@ generates four methods:
 
 
 A class may have primary or auxiliary constructors, auxiliary constructors are defined with the keyword 'this'. Every auxiliar
-constructor, must start by calling the primary constructor, or a previous  auxiliary constructor, e.g:
+constructor must start by calling the primary constructor, or a previous  auxiliary constructor, e.g:
 
     class Person {  
         
@@ -253,26 +253,23 @@ Answers:
 // initial implementation
 
 class Counter {
-    private var value = 0 
+    private var value = Int.MaxValue            
     def increment() { value += 1 } 
     def current() = value
 }
 
 myCounter.increment()
-println(myCounter.current)
+println(myCounter.current)      // prints a negative value
 
 // new implementation
 
-val sum: Long = Int.MaxValue + 6                                // overflow
-val sumOfLongs: Long = (Int.MaxValue).asInstanceOf[Long] + 6    // sum handled successfully    
+val sum: Long = Int.MaxValue + 6                                // overflow (negative value)
+val sumOfLongs: Long = (Int.MaxValue).asInstanceOf[Long] + 6    // sum handled gracefully (positive value)    
 
 class Counter {
 
-    private var value: Long = Int.MaxValue 
-
-    def increment() {
-        value += 1
-    }
+    private var value: Long = Int.MaxValue                      // Long declaration
+    def increment() { value += 1 }
     def current = value
 }
 
@@ -299,10 +296,9 @@ class BankAccount(val balance: Long = 0) {
 val myAccount = new BankAccount
 myAccount.deposit(3).balance
 
-
 // non functional approach 
 
-class BankAccount(private var balance: Long = 0) {
+class BankAccount(private var balance: Long = 0) {      // a read only property we can modify
 
   def deposit(amount: Int) = {
     balance += amount
@@ -357,12 +353,17 @@ val time2 = new Time(3,5)
 time1.before(time2)
 
 
-    5. UNRESOLVED. Follow the steps on page 74.
+    5. UNRESOLVED "javap check". Follow the steps on page 74 for instructions.
 
 class Student {
   @BeanProperty var name: String = _
   @BeanProperty var id: Long = _
 }
+
+val student = new Student()
+student.setName("david")         // yes, you can call the JavaBeans
+student.getName                  // getters and setters in scala
+
 
     6. 
 
@@ -376,8 +377,61 @@ class Person() {
 
 class Person(var age: Int) { 
   if (age < 0) age = 0
+  // todo: define a custom setter, with a guard
 }
 
 val person = new Person(-30)
 person.age
 
+
+    7. It should be a simple variable. Like this, it won't generate 
+       setters or getters and it will only be accessible to the class
+       methods, which is what we need (right ?!).  
+
+class Person(fullname: String ) {
+  
+  private val fullnameList = fullname.split(" +")
+
+  val name: String = fullnameList.lift(0).getOrElse("")
+  val surname: String = fullnameList.lift(1).getOrElse("")
+}
+
+val person = new Person("david jaramillo")
+person.name
+person.surname
+
+
+    8. 
+
+class Car(val manufacturer: String, val modelName: String,
+          val modelYear: Int = -1, var license: String = "") {}
+
+val myCar = new Car("Toyota", "pro")
+myCar.modelYear
+myCar.license
+
+val mySecondCar = new Car("Toyota", "pro", 2018, "WMQ999")
+mySecondCar.modelYear
+mySecondCar.license
+
+
+    9. In java we would have about 3 lines per property (GETTERS and SETTERS). 
+    and 3 constructors. A contructor for all properties, 3 props, and 2 props.
+
+    10. The second version is far simpler to understand
+
+// default version 
+
+class Employee(val name: String, var salary: Double) {
+  def this() { this("John Q. Public", 0.0) }  // primary default constructor
+}
+
+val employee = new Employee()
+employee.name
+
+// new version using default values in the primary constructor
+
+class Employee(val name: String = "John Q. Public", val salary: Double = 0.0)
+
+val employee = new Employee()
+employee.name
