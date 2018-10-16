@@ -1,0 +1,68 @@
+
+    Chapter 6
+
+
+--- Singletons ---
+
+
+Scala has no static methods or fields. Instead, you use the object construct. 
+
+-> The constructor of an object is executed when the object is first used.
+
+-> An object can have essentially all the features of a class—it can even extend other
+classes or traits. You cannot provide constructor parameters.
+
+-> The class and its companion object can access each other’s private features (sharedName.methodName).
+They must be located in the same source file.
+
+use cases:
+
+    - As a home for utility functions or constants
+    - When a single immutable instance can be shared efficiently
+    - When a single instance is required to coordinate some service (the singleton design pattern)
+
+
+--- Objects extending a class or trait ---
+
+
+An object can extend a class and/or one or more traits. The result is an object of
+a class that extends the given class and/or traits, and in addition has all of the
+features specified in the object definition.
+
+
+--- Apply method --- 
+
+
+It is common to have objects with an apply method. The apply method is called for
+expressions of the form: 
+
+    Object(arg1, ..., argN)
+
+
+--- Application objects ---
+
+
+Each Scala program must start with an object’s main method of type Array[String]
+
+    object Hello {
+        def main(args: Array[String]) {
+            println("Hello, World!")
+        }
+    }
+
+Instead of providing a main method for your application, you can extend the App
+trait and place the program code into the constructor body:
+
+    object Hello extends App {
+        println("Hello, World!")                
+        println(" ${args(0)}")       // and you access the arguments like this   
+    }
+
+
+--- Enumerations ---
+
+
+Unlike Java or C++, Scala does not have enumerated types. However, the standard
+library provides an Enumeration helper class that you can use to produce
+enumerations.
+
