@@ -66,3 +66,82 @@ Unlike Java or C++, Scala does not have enumerated types. However, the standard
 library provides an Enumeration helper class that you can use to produce
 enumerations.
 
+    object TrafficLightColor extends Enumeration {
+        val Red, Yellow, Green = Value        // Value is a method of enumeration. It returns
+                                              // new instance of an inner class named Value  
+    }
+
+you can specify an id, and a name. If you dont, the id starts from 0, and the name 
+is taken from the variable name field:
+
+    val Red = Value(10, "Red Color")
+    val Blue = Value(20, "Blue Color")
+
+The type of the enumeration (TrafficLightColor.Red, ...) is not TrafficLightColor, but Value.
+You can rename that type like so: 
+
+    ...
+    type TrafficLightColor = Value
+    val Red, Yellow, Green = Value
+    ...
+
+Now the type of the enumeration is TrafficLightColor.TrafficLightColor:
+
+    import TrafficLightColor._
+
+    def doWhat(color: TrafficLightColor) = {
+        if (color == Red) "stop"
+        else if (color == Yellow) "hurry up"
+        else "go"
+    }
+
+You can traverse those values (enumClass.values), get each value its id, and name:
+
+    for (c <- TrafficLightColor.values) println(s"${c.id}: $c")
+
+You may access the enumeratios like this:
+
+    TrafficLightColor(0)                // Calls Enumeration.apply, Call by ID
+    TrafficLightColor.withName("Red")   // Call by name
+
+
+Answers:
+
+
+    1.
+
+object Conversions {
+  def inchesToCentimeters (inches: Float) = inches * (2.54).toFloat
+  def gallonsToLiters (gallons: Float)= gallons * (3.78541).toFloat
+}
+
+Conversions.inchesToCentimeters(6)
+Conversions.gallonsToLiters(6)
+
+
+    2.
+
+abstract class UnitConversion {
+  def apply(lengthUnit: Float): Float
+}
+
+object InchesToCentimeters extends UnitConversion {
+  override def apply(lengthUnit: Float): Float = {
+    lengthUnit * (2.54).toFloat
+  }
+}
+
+object gallonsToLiters extends UnitConversion {
+  override def apply(lengthUnit: Float): Float = {
+    lengthUnit * (3.78541).toFloat
+  }
+}
+
+InchesToCentimeters(1)
+gallonsToLiters(1)
+
+
+    3.
+
+
+
