@@ -113,6 +113,7 @@ Answers:
 object Conversions {
   def inchesToCentimeters (inches: Float) = inches * (2.54).toFloat
   def gallonsToLiters (gallons: Float)= gallons * (3.78541).toFloat
+  // milesToKilometers function ...
 }
 
 Conversions.inchesToCentimeters(6)
@@ -137,6 +138,8 @@ object gallonsToLiters extends UnitConversion {
   }
 }
 
+// milesToKilometers object ...
+
 InchesToCentimeters(1)
 gallonsToLiters(1)
 
@@ -158,6 +161,35 @@ point1.x
 point1.y
 
 
-    5. SKIPPED
+    5. VERIFY
 
-    6. 
+object Reverse extends App {
+	println(args.reverse.mkString(" "))
+}
+
+
+    6. VERIFY
+
+object PlayingCard extends Enumeration {
+
+  type PlayingCard = Value
+
+  val Clubs = Value("♣")
+  val Diamonds = Value("♦")
+  val Hearts = Value("♥")   
+  val Spades = Value("♠")
+}
+
+print(PlayingCard.values)       // prints out "?" on a intelliJ worksheet. 
+
+
+    7.  Hearts and Diamonds are red
+
+// inside the playing card object
+
+def isRed(card: PlayingCard) = {
+    if (card == Hearts | card == Diamonds) true else false
+}
+
+PlayingCard.isRed(PlayingCard.Diamonds)     // true
+PlayingCard.isRed(PlayingCard.Spades)       // false
