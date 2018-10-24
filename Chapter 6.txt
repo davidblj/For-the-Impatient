@@ -185,7 +185,7 @@ print(PlayingCard.values)       // prints out "?" on a intelliJ worksheet.
 
     7.  Hearts and Diamonds are red
 
-// inside the playing card object
+// inside the PlayingCard object
 
 def isRed(card: PlayingCard) = {
     if (card == Hearts | card == Diamonds) true else false
@@ -193,3 +193,22 @@ def isRed(card: PlayingCard) = {
 
 PlayingCard.isRed(PlayingCard.Diamonds)     // true
 PlayingCard.isRed(PlayingCard.Spades)       // false
+
+
+    8. 
+
+object ColorCube extends Enumeration {
+
+  type ColorCube = Value
+
+  val black = Value(0x000000)
+  val blue = Value(0x0000FF)
+  val red = Value(0xFF0000)
+  val magenta = Value(0xFF00FF)
+  val green = Value(0x008000)
+  val cyan = Value(0x00FFFF)
+  val yellow = Value(0xFFFF00)
+  val white = Value(0xFFFFFF)
+}
+
+ColorCube.values
